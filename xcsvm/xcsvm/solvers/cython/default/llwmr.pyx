@@ -174,9 +174,9 @@ def llw_mr_sparse_solver_updates__variant_0(
     for ci in parallel.prange(len_classes,
                               nogil=True,
                               schedule="dynamic"):
-    #for ci in xrange(len_classes):
+    #for ci in range(len_classes):
 
-        for i in xrange(len_X):
+        for i in range(len_X):
             ii = idx[i]
 
             if yi[ii] == ci:
@@ -189,7 +189,7 @@ def llw_mr_sparse_solver_updates__variant_0(
             a = alpha[ci, ii]
             #  it follows g = -1 - X[ii].dot(W[ci])
             g = -1
-            for j in xrange(indptr[ii], indptr[ii+1]):
+            for j in range(indptr[ii], indptr[ii+1]):
                 g = g - data[j]*W[ci, indices[j]]
 
             delta = llw_mr_subproblem(
@@ -213,7 +213,7 @@ def llw_mr_sparse_solver_updates__variant_0(
                 data_shrink_state[ci, ii] = 0
 
             # it follows W[ci] -= delta * X[ii]
-            for j in xrange(indptr[ii], indptr[ii+1]):
+            for j in range(indptr[ii], indptr[ii+1]):
                 W[ci, indices[j]] -= delta * data[j]
 
     pass
@@ -259,7 +259,7 @@ def llw_mr_sparse_solver_updates__variant_1(
     len_X = X.shape[0]
 
 
-    for i in xrange(len_X):
+    for i in range(len_X):
         ii = idx[i]
 
         for ci in parallel.prange(len_classes,
@@ -276,7 +276,7 @@ def llw_mr_sparse_solver_updates__variant_1(
             a = alpha[ci, ii]
             #  it follows g = -1 - X[ii].dot(W[ci])
             g = -1
-            for j in xrange(indptr[ii], indptr[ii+1]):
+            for j in range(indptr[ii], indptr[ii+1]):
                 g = g - data[j]*W[ci, indices[j]]
 
             delta = llw_mr_subproblem(
@@ -300,7 +300,7 @@ def llw_mr_sparse_solver_updates__variant_1(
                 data_shrink_state[ci, ii] = 0
 
             # it follows W[ci] -= delta * X[ii]
-            for j in xrange(indptr[ii], indptr[ii+1]):
+            for j in range(indptr[ii], indptr[ii+1]):
                 W[ci, indices[j]] -= delta * data[j]
 
     pass

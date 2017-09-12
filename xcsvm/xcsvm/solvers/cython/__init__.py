@@ -13,5 +13,5 @@ def get_module(name, dtype=None, idtype=None):
     module_name = ".dtype_%s_idtype_%s.%s" % (dtypes, idtypes, name)
 
     ret = importlib.import_module(module_name, __name__)
-    print dtype, idtype, module_name, ret
+    print(dtype, idtype, module_name, ret)
     return ret

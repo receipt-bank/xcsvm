@@ -116,14 +116,14 @@ def ww_sparse_solver_updates_local__variant_0(
     cdef np.int8_t * changed_mask_a = NULL
     cdef np.int8_t * changed_mask_b = NULL
 
-    for round_idx in xrange(rounds_lookup.shape[0]):
+    for round_idx in range(rounds_lookup.shape[0]):
         len_pairs = 0
 
         round = rounds_lookup[round_idx]
 
         if ggia == ggib:
             if round == 0:
-                for gi in xrange(global_group_sizes[ggia]):
+                for gi in range(global_group_sizes[ggia]):
                     pairs[len_pairs, 0] = global_groups[ggia, gi]
                     pairs[len_pairs, 1] = global_groups[ggia, gi]
                     len_pairs += 1
@@ -131,7 +131,7 @@ def ww_sparse_solver_updates_local__variant_0(
                 if global_group_sizes[ggia] == 1:
                     continue
 
-                for gi in xrange(global_group_sizes[ggia]):
+                for gi in range(global_group_sizes[ggia]):
                     match = get_match(gi, round-1, global_group_sizes[ggia])
                     if gi < match:
                         pairs[len_pairs, 0] = global_groups[ggia, gi]
@@ -140,7 +140,7 @@ def ww_sparse_solver_updates_local__variant_0(
         else:
             if global_group_sizes[ggia] > global_group_sizes[ggib]:
                 assert rounds_lookup.shape[0] == global_group_sizes[ggia]
-                for gi in xrange(global_group_sizes[ggib]):
+                for gi in range(global_group_sizes[ggib]):
                     pairs[len_pairs, 0] = global_groups[ggia,
                                                         (gi+round) %
                                                         global_group_sizes[ggia]]
@@ -148,7 +148,7 @@ def ww_sparse_solver_updates_local__variant_0(
                     len_pairs += 1
             else:
                 assert rounds_lookup.shape[0] == global_group_sizes[ggib]
-                for gi in xrange(global_group_sizes[ggia]):
+                for gi in range(global_group_sizes[ggia]):
                     pairs[len_pairs, 0] = global_groups[ggia, gi]
                     pairs[len_pairs, 1] = global_groups[ggib,
                                                         (gi+round) %
@@ -158,8 +158,8 @@ def ww_sparse_solver_updates_local__variant_0(
         for pi in parallel.prange(len_pairs,
                                   nogil=True,
                                   schedule="dynamic"):
-        #for pi in xrange(len_pairs):
-            for xi in xrange(2):
+        #for pi in range(len_pairs):
+            for xi in range(2):
                 if (pairs_shuffle[round]+xi)%2 == 0:
                     gia, gib = pairs[pi, 0], pairs[pi, 1]
                     idx2 = &ggr_to_samples[ggib, 0]
@@ -180,7 +180,7 @@ def ww_sparse_solver_updates_local__variant_0(
                     changed_mask_a = &global_changed_mask[group_mapping[gia], 0]
                     changed_mask_b = &global_changed_mask[group_mapping[gib], 0]
 
-                for i in xrange(group_data_ranges[gia, 0], group_data_ranges[gia, 1]):
+                for i in range(group_data_ranges[gia, 0], group_data_ranges[gia, 1]):
                     ii = idx[i]
                     ii2 = idx2[ii]
                     #assert ii2 != 10000000
@@ -193,29 +193,29 @@ def ww_sparse_solver_updates_local__variant_0(
                     yi_rel = yi_to_gx[yi, 1]
 
                     #  it follows g = -1 - X[ii].dot(W[gia]-W[gib])
-                    for ci in xrange(group_sizes[gib]):
+                    for ci in range(group_sizes[gib]):
                         class_tmp[ci] = 0
 
                     tmp = 0
                     if gia == gib:
-                        for j in xrange(indptr[ii], indptr[ii+1]):
-                            for ci in xrange(group_sizes[gib]):
+                        for j in range(indptr[ii], indptr[ii+1]):
+                            for ci in range(group_sizes[gib]):
                                 class_tmp[ci] = class_tmp[ci] + data[j] * W_b[indices[j]*Wxdim+ci]
                         tmp = class_tmp[yi_rel]
                     else:
-                        for j in xrange(indptr[ii], indptr[ii+1]):
+                        for j in range(indptr[ii], indptr[ii+1]):
                             tmp = tmp + data[j] * W_a[indices[j]*Wxdim+yi_rel]
-                            for ci in xrange(group_sizes[gib]):
+                            for ci in range(group_sizes[gib]):
                                 class_tmp[ci] = class_tmp[ci] + data[j] * W_b[indices[j]*Wxdim+ci]
 
-                    for ci in xrange(group_sizes[gib]):
+                    for ci in range(group_sizes[gib]):
                         class_tmp[ci] = tmp - 1.0 - class_tmp[ci]
 
                     max_buffer = 1E10;
                     tmp = 0
                     idx_tmp_i = 0
 
-                    for ci in xrange(group_sizes[gib]):
+                    for ci in range(group_sizes[gib]):
                         if gia == gib and ci == yi_rel:
                             continue
 
@@ -261,13 +261,13 @@ def ww_sparse_solver_updates_local__variant_0(
                         
                         # it follows W[gia] += delta * X[ii]
                         # it follows W[gib] -= delta * X[ii]
-                        for j in xrange(indptr[ii], indptr[ii+1]):
+                        for j in range(indptr[ii], indptr[ii+1]):
                             if log_changes == 1:
                                 changed_mask_a[indices[j]] = 1
                                 changed_mask_b[indices[j]] = 1
 
                             W_a[indices[j]*Wxdim+yi_rel] += tmp * data[j]
-                            for idx_tmp_ii in xrange(0, idx_tmp_i):
+                            for idx_tmp_ii in range(0, idx_tmp_i):
                                 W_b[indices[j]*Wxdim+idx_tmp[idx_tmp_ii]] -= class_tmp[idx_tmp_ii] * data[j]
                     elif shrinking == 1 and idx_tmp_i < group_sizes[gib]:
                         data_shrink_state[ii2] += 1
@@ -354,14 +354,14 @@ def ww_sparse_solver_updates_local__variant_1(
     cdef np.int8_t * changed_mask_a = NULL
     cdef np.int8_t * changed_mask_b = NULL
 
-    for round_idx in xrange(rounds_lookup.size):
+    for round_idx in range(rounds_lookup.size):
         len_pairs = 0
 
         round = rounds_lookup[round_idx]
 
         if ggia == ggib:
             if round == 0:
-                for gi in xrange(global_group_sizes[ggia]):
+                for gi in range(global_group_sizes[ggia]):
                     pairs[len_pairs, 0] = global_groups[ggia, gi]
                     pairs[len_pairs, 1] = global_groups[ggia, gi]
                     len_pairs += 1
@@ -369,7 +369,7 @@ def ww_sparse_solver_updates_local__variant_1(
                 if global_group_sizes[ggia] == 1:
                     continue
 
-                for gi in xrange(global_group_sizes[ggia]):
+                for gi in range(global_group_sizes[ggia]):
                     match = get_match(gi, round-1, global_group_sizes[ggia])
                     if gi < match:
                         pairs[len_pairs, 0] = global_groups[ggia, gi]
@@ -378,7 +378,7 @@ def ww_sparse_solver_updates_local__variant_1(
         else:
             if global_group_sizes[ggia] > global_group_sizes[ggib]:
                 assert rounds_lookup.shape[0] == global_group_sizes[ggia]
-                for gi in xrange(global_group_sizes[ggib]):
+                for gi in range(global_group_sizes[ggib]):
                     pairs[len_pairs, 0] = global_groups[ggia,
                                                         (gi+round) %
                                                         global_group_sizes[ggia]]
@@ -386,7 +386,7 @@ def ww_sparse_solver_updates_local__variant_1(
                     len_pairs += 1
             else:
                 assert rounds_lookup.shape[0] == global_group_sizes[ggib]
-                for gi in xrange(global_group_sizes[ggia]):
+                for gi in range(global_group_sizes[ggia]):
                     pairs[len_pairs, 0] = global_groups[ggia, gi]
                     pairs[len_pairs, 1] = global_groups[ggib,
                                                         (gi+round) %
@@ -396,8 +396,8 @@ def ww_sparse_solver_updates_local__variant_1(
         for pi in parallel.prange(len_pairs,
                                   nogil=True,
                                   schedule="dynamic"):
-        #for pi in xrange(len_pairs):
-            for xi in xrange(2):
+        #for pi in range(len_pairs):
+            for xi in range(2):
                 if (pairs_shuffle[round]+xi)%2 == 0:
                     gia, gib = pairs[pi, 0], pairs[pi, 1]
                     idx2 = &ggr_to_samples[ggib, 0]
@@ -424,7 +424,7 @@ def ww_sparse_solver_updates_local__variant_1(
                 optimal = class_optimal[gia]
                 max_violation = class_max_violation[gia]
 
-                for i in xrange(group_data_ranges[gia, 0], group_data_ranges[gia, 1]):
+                for i in range(group_data_ranges[gia, 0], group_data_ranges[gia, 1]):
                     ii = idx[i]
                     ii2 = idx2[ii]
 
@@ -439,7 +439,7 @@ def ww_sparse_solver_updates_local__variant_1(
                     datap1 = &data[indptr[ii]]
 
                     #  it follows g = -1 - X[ii].dot(W[gia]-W[gib])
-                    for ci in xrange(grb0, grb1):
+                    for ci in range(grb0, grb1):
                         class_tmp[ci] = 0
 
                     tmp_y = 0
@@ -476,13 +476,13 @@ def ww_sparse_solver_updates_local__variant_1(
                             tmp_y = tmp_y + a * W_a[dindicesp*Wxdim+yi_rel]
                             PI(indicesp); PI(datap)
 
-                    for ci in xrange(grb0, grb1):
+                    for ci in range(grb0, grb1):
                         class_tmp[ci] = tmp_y - 1.0 - class_tmp[ci]
 
                     max_buffer = 1E10;
                     tmp_y = 0
                     idx_tmp_i = grb0
-                    for ci in xrange(grb0, grb1):
+                    for ci in range(grb0, grb1):
                         if gia == gib and ci == yi_rel:
                             continue
 

@@ -223,7 +223,7 @@ class BaseXMCSolver(object):
             except:
                 traceback.print_exc()
             traceback.print_exc()
-            raise exc_info[0], exc_info[1], exc_info[2]
+            raise(exc_info[0], exc_info[1], exc_info[2])
         else:
             try:
                 self._log.debug("Teardown training.")
@@ -261,7 +261,7 @@ class BaseXMCSolver(object):
                 tmp0, tmp1 = np.empty_like(msg), np.empty_like(msg)
                 tmp0[:, 0] = msg[:, 0]
                 tmp1[:, 0] = msg[:, 1]
-                for i in xrange(1, self._mpi_size):
+                for i in range(1, self._mpi_size):
                     self._mpi.Recv(msg_remote, source=i)
                     tmp0[:, 1] = msg_remote[:, 0]
                     tmp1[:, 1] = msg_remote[:, 1]
@@ -421,7 +421,7 @@ class FitWithUpdateMixin(object):
         last_print = start_time
         iter_mod = 1
 
-        for i in xrange(1, self.max_iter+1):
+        for i in range(1, self.max_iter+1):
             class_max_violation[:] = 0
 
             optimal, extra = update_function(i, class_max_violation)

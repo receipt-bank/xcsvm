@@ -105,7 +105,7 @@ if __name__ == "__main__":
                     f.write("\n".join(["%i" % x for x in y_hat]))
 
         except Exception as e:
-            print "Error during prediction:"
+            print("Error during prediction:")
             traceback.print_exc()
 
     if args.train_data is not None and args.model_dir is not None:
