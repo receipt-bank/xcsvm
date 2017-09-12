@@ -66,35 +66,8 @@ class MPILogger(object):
         self._rank = rank
         pass
 
-    class CustomLogger(logging.Logger):
-        def findCaller(self):
-            """
-            Find the stack frame of the caller so that we can note the source
-            file name, line number and function name.
-            """
-            f = sys._getframe(3)
-            # On some versions of IronPython, currentframe() returns None if
-            # IronPython isn't run with -X:Frames.
-            if f is not None:
-                f = f.f_back
-
-            _srcfiles = [os.path.normcase(__file__),
-                         logging._srcfile]
-
-            rv = "(unknown file)", 0, "(unknown function)"
-            while hasattr(f, "f_code"):
-                co = f.f_code
-                filename = os.path.normcase(co.co_filename)
-                if filename in _srcfiles:
-                    f = f.f_back
-                    continue
-                rv = (co.co_filename, f.f_lineno, co.co_name)
-                break
-            return rv
-
     def _get_logger(self, name):
         old_class = logging.getLoggerClass()
-        logging.setLoggerClass(MPILogger.CustomLogger)
         logger = logging.getLogger(name)
         logging.setLoggerClass(old_class)
         return logger

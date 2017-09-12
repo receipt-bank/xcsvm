@@ -106,7 +106,7 @@ class GroupSplitSetupMixin(DefaultSetupMixin):
                             (0, self.group_count, self._all_classes.size))
 
         ret = [[[], 0, 0]  # group members, sample count, class count
-               for i in xrange(self.group_count)]
+               for i in range(self.group_count)]
 
         idx = np.arange(self._all_classes.size)
         if self.grouping_shuffle_sizes is True:
@@ -164,7 +164,7 @@ class GroupSplitSetupMixin(DefaultSetupMixin):
         self._group_members = []
         self._group_ranges = []
         self._group_data_ranges = []
-        self._folded_group_data_ranges = [[] for i in xrange(self.folds)]
+        self._folded_group_data_ranges = [[] for i in range(self.folds)]
 
         i = 0
         data_i = 0
@@ -189,7 +189,7 @@ class GroupSplitSetupMixin(DefaultSetupMixin):
             size = x[1]-x[0]
             fold_size = int(size / self.folds)
             missing = size % self.folds
-            for fold_i in xrange(self.folds):
+            for fold_i in range(self.folds):
                 self._folded_group_data_ranges[fold_i].append(
                     (x[0]+fold_i * fold_size + min(missing, fold_i),
                      x[0]+(fold_i+1) * fold_size + min(missing, fold_i+1))
@@ -253,7 +253,7 @@ class GroupSplitSetupMixin(DefaultSetupMixin):
                                             self._max_global_group_size),
                                            dtype=self.idtype)
             tmp_range = np.arange(self._group_count, dtype=self.idtype)
-            for i in xrange(ggc):
+            for i in range(ggc):
                 s = self._global_group_sizes[i]
                 self._global_groups[i, :s] = tmp_range[i::ggc]
 
@@ -267,7 +267,7 @@ class GroupSplitSetupMixin(DefaultSetupMixin):
                                            dtype=self.idtype)
             for i, (s, gg)  in enumerate(zip(self._global_group_sizes,
                                            self._global_groups)):
-                for j in xrange(s):
+                for j in range(s):
                     if i in self._local_global_groups:
                         # map to first/second block
                         self._group_mapping[gg[j]] = (i%2)*self._W_block_size+j
@@ -299,7 +299,7 @@ class GroupSplitSetupMixin(DefaultSetupMixin):
 
             n = self.idtype(self._n_samples)
             ggr_masks = np.zeros((self._global_group_count, n), dtype=np.uint8)
-            for i in xrange(self._global_group_count):
+            for i in range(self._global_group_count):
                 for g in self._global_groups[i][:self._global_group_sizes[i]]:
                     for c in range(self._group_ranges[g, 0], self._group_ranges[g, 1]):
                         ggr_masks[i][:] += self._y == self._all_classes[c]
@@ -321,7 +321,7 @@ class GroupSplitSetupMixin(DefaultSetupMixin):
             ggr_active_masks[ggr_la] += ggr_masks[ggr_lb]
             ggr_active_masks[ggr_lb] += ggr_masks[ggr_la]
 
-            for mpi_round in xrange(mpi_rounds):
+            for mpi_round in range(mpi_rounds):
                 mpim = get_match(mpir, mpi_round, self._mpi_size)
                 if mpim == mpir:
                     continue
@@ -352,7 +352,7 @@ class GroupSplitSetupMixin(DefaultSetupMixin):
                 self._ggr_to_samples = np.zeros(self._ggr_masks.shape,
                                                 self.idtype) + 10**7
 
-                for i in xrange(self._global_group_count):
+                for i in range(self._global_group_count):
                     tmp = np.arange(self._samples_per_ggr[i], dtype=self.idtype)
                     self._ggr_to_samples[i][ggr_active_masks[i].astype(np.bool)] = tmp
 
@@ -360,7 +360,7 @@ class GroupSplitSetupMixin(DefaultSetupMixin):
                                              dtype=self.idtype)
                 tmp = self.idtype(0)
                 tmpi = 0
-                for i in xrange(self._global_group_count):
+                for i in range(self._global_group_count):
                     for g in self._global_groups[i][:self._global_group_sizes[i]]:
                         self._gr_to_alpha[tmpi] = tmp
                         tmp += self._samples_per_ggr[i]*self._max_group_size
@@ -606,7 +606,7 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
             x = a[:s]
             ret = np.all((x[1:]-x[:-1]) > 0) and (np.unique(x).size == s)
             if not ret:
-                print "issorted", s, x
+                print("issorted", s, x)
             return ret
 
         if self.mpi_send_sparse is True:
@@ -653,22 +653,22 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
                     if tmp_nnz != nnz:
                         tmp_ssi, tmp_ssd = tmp_ssi[:tmp_nnz], tmp_ssd[:tmp_nnz]
                         ssi, ssd = ssi[:nnz], ssd[:nnz]
-                        #print tmp_ssi[:100], ssi[:100]
+                        #print(tmp_ssi[:100], ssi[:100])
                         diff = np.in1d(ssi, tmp_ssi, invert=True)
-                        print s, diff.size, tmp_nnz, nnz, (nda != 0).sum()
-                        print s, (nda[tmp_ssi] == 0).sum(), (nda[ssi] == 0).sum()
-                        print s, ssi[(nda[ssi] == 0)], nda[ssi[(nda[ssi] == 0)]]
+                        print(s, diff.size, tmp_nnz, nnz, (nda != 0).sum())
+                        print(s, (nda[tmp_ssi] == 0).sum(), (nda[ssi] == 0).sum())
+                        print(s, ssi[(nda[ssi] == 0)], nda[ssi[(nda[ssi] == 0)]])
                     assert tmp_nnz == nnz, (s, tmp_nnz, nnz)
                     tmp_ssi, tmp_ssd = tmp_ssi[:tmp_nnz], tmp_ssd[:tmp_nnz]
                     ssi, ssd = ssi[:nnz], ssd[:nnz]
 
                     condition = np.allclose(tmp_ssi, ssi)
                     if not condition:
-                        print nnz, tmp_ssi[:100], ssi[:100]
+                        print(nnz, tmp_ssi[:100], ssi[:100])
                     assert condition, "%s_sparse_idx" % s
                     condition = np.allclose(tmp_ssd, ssd)
                     if not condition:
-                        print nnz, tmp_ssd[:100], ssd[:100], nda
+                        print(nnz, tmp_ssd[:100], ssd[:100], nda)
                     assert condition, "%s_sparse_data" % s
 
             send_nda = send_nda.ravel()
@@ -814,8 +814,8 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
                         send_sparse_idx = cache[2]
                         send_sparse_data = cache[3]
 
-                    #print np.unique(send_sparse_idx[:nnz]).size, nnz
-                    #print got_zero, send_sparse_idx[:nnz][send_sparse_data[:nnz] == 0], send_sparse_data[:nnz] == 0
+                    #print(np.unique(send_sparse_idx[:nnz]).size, nnz)
+                    #print(got_zero, send_sparse_idx[:nnz][send_sparse_data[:nnz] == 0], send_sparse_data[:nnz] == 0)
                     #assert np.unique(send_sparse_idx[:nnz]).size == nnz
 
             if self.mpi_join_communication is False:
@@ -856,7 +856,7 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
             else:
                 raise NotImplementedError("This implementation does not work.")
                 history = self._mpi__comm_history__
-                #print history
+                #print(history)
                 if False:
                     start_size = max(self.idtype(history[2].max()*1.1), history[1])
                 else:
@@ -1001,7 +1001,7 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
                 step = (2**31-1)/self.dtype(0).nbytes
                 while i < s:
                     b, e = i, min(s, i+step)
-                    #print b, e
+                    #print(b, e)
                     self._mpi.Sendrecv(send_tmp[b:e], mpi_rank, recvbuf=recv_tmp[b:e], source=mpi_rank)
                     i = e
                 assert np.allclose(recv_nda.ravel(), recv_tmp)
@@ -1014,7 +1014,7 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
             step = (2**31-1)/self.dtype(0).nbytes
             while i < s:
                 b, e = i, min(s, i+step)
-                #print b, e
+                #print(b, e)
                 start_time = time.time()
                 self._mpi.Sendrecv(send_tmp[b:e], mpi_rank, recvbuf=recv_tmp[b:e], source=mpi_rank)
                 self._network_time1 += time.time()-start_time
@@ -1193,7 +1193,7 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
                                      dtype=self.idtype)
                 tmp = self.idtype(0)
                 tmpi = 0
-                for i in xrange(self._global_group_count):
+                for i in range(self._global_group_count):
                     for g in self._global_groups[i][:self._global_group_sizes[i]]:
                         gr_to_shr[tmpi] = tmp
                         tmp += self._samples_per_ggr[i]
@@ -1228,7 +1228,7 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
                 X, yi, K = self._X, self._yi, self._K
                 alpha, idx = self._alpha, self._idx
 
-                for fold in xrange(self.folds):
+                for fold in range(self.folds):
 
                     if self.shuffle_rounds is True:
                         np.random.shuffle(rounds)
@@ -1377,7 +1377,7 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
                 global_folds = 1
                 if self.mpi_local_folds is False:
                     global_folds = self.folds
-                for global_fold in xrange(global_folds):
+                for global_fold in range(global_folds):
 
                     if self.shuffle_rounds is True:
                         random_state.shuffle(mpi_rounds)
@@ -1473,7 +1473,7 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
                                 local_folds = self.folds
 
                             lcmv = None
-                            for inner_repeat in xrange(self.inner_repeat):
+                            for inner_repeat in range(self.inner_repeat):
 
                                 if self.shuffle is True:
                                     for a, b in self._group_data_ranges:
@@ -1481,7 +1481,7 @@ class WW_Sparse_Solver(GroupSplitSetupMixin,
 
                                 class_max_violation2 = np.zeros_like(class_max_violation)
 
-                                for local_fold in xrange(local_folds):
+                                for local_fold in range(local_folds):
                                     if self.mpi_local_folds is True:
                                         fold = local_fold
                                     else:

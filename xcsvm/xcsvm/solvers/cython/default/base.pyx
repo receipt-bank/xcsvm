@@ -67,8 +67,8 @@ def dist_sum_axis_0(
         a = ci*chunk_size + min(ci, plus_one)
         b = (ci+1)*chunk_size + min(ci+1, plus_one)
 
-        for i in xrange(a, b):
-            for j in xrange(x.shape[1]):
+        for i in range(a, b):
+            for j in range(x.shape[1]):
                 tmp[ci, j] += x[i, j]
 
     return tmp.sum(axis=0)
@@ -96,8 +96,8 @@ def dist_subtraction_axis_0(
         a = ci*chunk_size + min(ci, plus_one)
         b = (ci+1)*chunk_size + min(ci+1, plus_one)
 
-        for i in xrange(a, b):
-            for j in xrange(x.shape[1]):
+        for i in range(a, b):
+            for j in range(x.shape[1]):
                 x[i, j] -= s[j]
     pass
 
@@ -126,7 +126,7 @@ def dist_set_to_zero(
         a = ci*chunk_size + min(ci, plus_one)
         b = (ci+1)*chunk_size + min(ci+1, plus_one)
 
-        for i in xrange(a, b):
+        for i in range(a, b):
             x[i] = 0
     pass
 

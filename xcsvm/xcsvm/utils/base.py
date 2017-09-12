@@ -41,7 +41,7 @@ def folds(n, s):
     fold_size = int(float(s)/n)
     missing = s - fold_size * n
     a, b = None, 0
-    for i in xrange(n):
+    for i in range(n):
         a = b
         b = a+fold_size
         if i < missing:
@@ -183,15 +183,15 @@ def time_it(f, name="Function", profile=False, line_profile=False):
     msg = ("%s time: %.3f s" % (name, end-start))
 
     if profile is True or line_profile is True:
-        print "*" * 79
-        print "Profile:"
+        print("*" * 79)
+        print("Profile:")
         if line_profile is True:
             profiler.print_stats()
         else:
             s = pstats.Stats(profiler)
             s = s.strip_dirs().sort_stats("time").reverse_order()
             s.print_stats()
-        print "*" * 79
+        print("*" * 79)
     return ret, msg
 
 
@@ -261,10 +261,10 @@ def capture_clib_stdoutput(f, print_only_on_failure=False):
         except:
             tmp_f.flush()
             tmp_f.seek(0)
-            print tmp_f.read()
+            print(tmp_f.read())
             raise
         if print_only_on_failure is not True:
             tmp_f.flush()
             tmp_f.seek(0)
-            print tmp_f.read()
+            print(tmp_f.read())
     return ret
