@@ -366,6 +366,14 @@ class BaseXMCSolver(object):
         ret._unserialize(dir_name, stats)
         return ret
 
+    @property
+    def W(self):
+        return self._W
+
+    @property
+    def classes(self):
+        return self._classes
+
 
 ###############################################################################
 
