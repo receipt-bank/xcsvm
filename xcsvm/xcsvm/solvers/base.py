@@ -6,6 +6,7 @@ import scipy
 import sys
 import time
 import traceback
+from scipy.sparse import csr_matrix
 
 from ..utils import base as ubase
 from ..utils import log as ulog
@@ -232,6 +233,9 @@ class BaseXMCSolver(object):
                 traceback.print_exc()
 
         return self
+
+    def sparsify(self, max_features):
+        self._W = csr_matrix(self._W[:, :max_features])
 
     def predict(self, X):
         # default we assume all nodes have the same data, though
