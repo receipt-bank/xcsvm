@@ -1,10 +1,9 @@
 import numpy as np
 import os
 import sys
-
 from nose.plugins.attrib import attr as testattr
 
-from ... import solvers
+from xcsvm import solvers
 from .. import base as ubase
 from .. import log as ulog
 from .. import mpi as umpi
